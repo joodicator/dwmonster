@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <title>Dungeon World Monster Maker</title>
+    <link rel="stylesheet" href="monster.css">
+    <script type="text/javascript" src="json2.js"></script>
+    <script type="text/javascript" src="cookies.js"></script>
+    <script type="text/javascript" src="monster.js"></script>
+</head>
+<body>
+    <div id="out_panel">
+        <div id="out_buttons">
+            <button id="out_new">New</button>
+            <button id="out_delete">Delete</button>
+        </div>
+        <div id="out_template" class="out_monster" hidden>
+            <div class="out_row">
+                <span id="out_name" class="out_field"></span>
+            </div>
+            <div class="out_row">
+                <span id="out_damage" class="out_field"></span> damage
+                (<span id="out_attack" class="out_field"></span>;
+                <span id="out_attack_tags" class="out_field"></span>)
+            </div>
+            <div class="out_row">
+                <span id="out_armour" class="out_field"></span> armour,
+                <span id="out_hp" class="out_field"></span> HP,
+                <span id="out_tags" class="out_field"></span>
+            </div>
+            <div class="out_row" id="out_qualities_row" hidden>
+                <span id="out_qualities_title">Special qualities:</span>
+                <span id="out_qualities" class="out_field"></span>
+            </div>
+            <div class="out_row">
+                <span id="out_instinct_title">Instinct:</span>
+                <span id="out_instinct" class="out_field"></span>
+            </div>
+            <div class="out_row">
+                <ul id="out_moves">
+                    <li id="out_move" class="out_field"></li>
+                    <li id="out_stealthy_move" class="out_field" hidden></li>
+                    <li id="out_magical_move" class="out_field" hidden></li>
+                    <li id="out_devious_move" class="out_field" hidden></li>
+                    <li id="out_organised_move" class="out_field" hidden></li>
+                    <li id="out_planar_move" class="out_field" hidden></li>
+                </ul>
+            </div>
+            <div class="out_row" id="out_damage_warning" class="warning" hidden>
+                Note: the rules "roll damage twice and take the better roll" and
+                "roll damage twice and take the worst result" both apply to this
+                monster. Defaulting to a normal roll.
+            </div>
+            <div id="out_handle_text"><div></div></div>
+            <div id="out_handle_top" contenteditable>JSON</div>
+        </div>
+    </div>
+    <form id="in_panel">
+        <div>
+            <div class="in_header">
+                <div>What is the monster's name?</div>
+            </div>
+            <div class="in_field">
+                <input id="in_name" name="name" type="text">
+            </div>
+        </div>
+        <div>
+            <div class="in_header">
+                What is it known to do?
+            </div>
+            Write a monster move describing what it does:<br>
+            <div class="in_field">
+                <input id="in_move" name="move" type="text">
+            </div>
+        </div>
+        <div>
+            <div class="in_header">
+                What does it want that causes problems for others?
+            </div>
+            This is its instinct. Write it as an intended action:<br>
+            <div class="in_field">
+                <input id="in_instinct" name="instinct" type="text">
+            </div>
+        </div>
+        <div>
+            <div class="in_header">
+                How does it usually hunt or fight?
+            </div>
+            <div><label for="in_horde">
+                <input id="in_horde" type="radio" name="number" value="horde">
+                In large groups<span class="append">horde,
+                d6 damage, 3 HP</span>
+            </label></div>
+            <div><label for="in_group">
+                <input id="in_group" type="radio" name="number" value="group">
+                In small groups, about 2-5<span class="append">group,
+                d8 damage, 6 HP</span>
+            </label></div>
+            <div><label for="in_solitary">
+                <input id="in_solitary" type="radio" name="number" value="solitary">
+                All by its lonesome<span class="append">solitary,
+                d10 damage, 12 HP</span>
+            </label></div>
+        </div>
+        <div>
+            <div class="in_header">
+                How big is it?
+            </div>
+            <div><label for="in_tiny">
+                <input id="in_tiny" type="radio" name="size" value="tiny">
+                Smaller than a house cat<span class="append">tiny,
+                hand, -2 damage</span>
+            </label></div>
+            <div><label for="in_small">
+                <input id="in_small" type="radio" name="size" value="small">
+                Halfling-esque<span class="append">small,
+                close</span>
+            </label></div>
+            <div><label for="in_human">
+                <input id="in_human" type="radio" name="size" value="human">
+                About human size<span class="append">close</span>
+            </label></div>
+            <div><label for="in_large">
+                <input id="in_large" type="radio" name="size" value="large">
+                As big as a cart<span class="append">
+                large, close, reach, +4 HP, +1 damage</span>
+            </label></div>
+            <div><label for="in_huge">
+                <input id="in_huge" type="radio" name="size" value="huge">
+                Much larger than a cart<span class="append">huge,
+                reach, +8 HP, +3 damage</span>
+            </label></div>
+        </div>
+        <div>
+            <div class="in_header">
+                What is its most important defence?
+            </div>
+            <div><label for="in_0_armour">
+                <input id="in_0_armour" type="radio" name="armour" value="0">
+                Cloth or flesh<span class="append">0 armour</span>
+            </label></div>
+            <div><label for="in_1_armour">
+                <input id="in_1_armour" type="radio" name="armour" value="1">
+                Leathers or thick hide<span class="append">1 armour</span>
+            </label></div>
+            <div><label for="in_2_armour">
+                <input id="in_2_armour" type="radio" name="armour" value="2">
+                Mail or scales<span class="append">2 armour</span>
+            </label></div>
+            <div><label for="in_3_armour">
+                <input id="in_3_armour" type="radio" name="armour" value="3">
+                Plate or bone<span class="append">3 armour</span>
+            </label></div>
+            <div><label for="in_4_armour">
+                <input id="in_4_armour" type="radio" name="armour" value="4">
+                Permanent magical protection<span class="append">4 armour,
+                magical</span>
+            </label></div>
+        </div>
+        <div>
+            <div class="in_header">
+                What is it known for?
+            </div>
+            <div><label for="in_forceful">
+                <input id="in_forceful" name="forceful" type="checkbox">
+                Unrelenting strength<span class="append">+2 damage, forceful</span>
+            </label></div>
+            <div><label for="in_skill_offense">
+                <input id="in_skill_offense" name="skill_offense" type="checkbox">
+                Skill in offense<span class="append">roll damage twice and take the better roll</span>
+            </label></div>
+            <div><label for="in_skill_defence">
+                <input id="in_skill_defence" name="skill_defence" type="checkbox">
+                Skill in defence<span class="append">+1 armour</span>
+            </label></div>
+            <div><label for="in_deft_strikes">
+                <input id="in_deft_strikes" name="deft_strikes" type="checkbox">
+                Deft strikes<span class="append">+1 piercing</span>
+            </label></div>
+            <div><label for="in_endurance">
+                <input id="in_endurance" name="endurance" type="checkbox">
+                Uncanny endurance<span class="append">+4 HP</span>
+            </label></div>
+            <div>
+                <label for="in_stealthy">
+                    <input id="in_stealthy" name="stealthy" type="checkbox">
+                    Deceit and trickery<span class="append">
+                    stealthy, write a move about dirty tricks:</span>
+                </label><br>
+                <div class="in_field">
+                    <input id="in_stealthy_move" name="stealthy_move"
+                           type="text" disabled>
+                </div>
+            </div>
+            <div>
+                <label for="in_adaptation">
+                    <input id="in_adaptation" name="adaptation" type="checkbox">
+                    A useful adaptation like being amphibious or having
+                    wings<span class="append"> add a special quality for the
+                    adaptation:</span>
+                </label><br>
+                <div class="in_field">
+                    <input id="in_adaptation_quality" name="adaptation_quality"
+                           type="text" disabled>
+                </div>
+            </div>
+            <div>
+                <label for="in_divine">
+                    <input id="in_divine" name="divine" type="checkbox">
+                    The favour of the gods<span class="append">
+                    divine, and your choice of:</span>
+                </label><br>
+                <label for="in_divine_damage">
+                    <input id="in_divine_damage" type="radio" name="divine_favour"
+                    value="damage" disabled><span>+2 damage</span>
+                </label>
+                <label for="in_divine_hp">
+                    <input id="in_divine_hp" type="radio" name="divine_favour"
+                    value="hp" disabled><span>+2 HP</span>
+                </label>
+                <label for="in_divine_both">
+                    <input id="in_divine_both" type="radio" name="divine_favour"
+                    value="both" disabled><span>both</span>
+                </label>
+            </div>
+            <div>
+                <label for="in_magical">
+                    <input id="in_magical" name="magical" type="checkbox">
+                    Spells and magic<span class="append">
+                    magical, write a move about its spells:</span>
+                </label><br>
+                <div class="in_field">
+                    <input id="in_magical_move" name="magical_move" type="text"
+                           disabled>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div class="in_header">
+                What is its most common form of attack?
+            </div>
+            <div>
+                Name it; common answers include: a type of weapon, claws, a
+                specific spell:
+                <br>
+                <div class="in_field">
+                    <input id="in_attack" name="attack" type="text">
+                </div>
+            </div>
+            <div><label for="in_vicious">
+                <input id="in_vicious" name="vicious" type="checkbox">
+                Its armaments are vicious and <s>leathery</s>
+                obvious<span class="append">+2 damage</span>
+            </label></div>
+            <div><label for="in_reach">
+                <input id="in_reach" name="reach" type="checkbox">
+                It lets the monster keep others at bay<span class="append">reach
+                </span>
+            </label></div>
+            <div><label for="in_weak">
+                <input id="in_weak" name="weak" type="checkbox">
+                Its armaments are small and weak<span class="append">reduce
+                its damage die size by one</span>
+            </label></div>
+            <div>
+                <label for="in_messy">
+                    <input id="in_messy" name="messy" type="checkbox">
+                    Its armaments can slice or pierce
+                    metal<span class="append">messy, and:</span>
+                </label><br>
+                <label for="in_piercing_1">
+                    <input id="in_piercing_1" type="radio" name="messy_piercing"
+                    value="1" disabled><span>
+                    +1 piercing, or</span>
+                </label>
+                <label for="in_piercing_3">
+                    <input id="in_piercing_3" type="radio" name="messy_piercing"
+                    value="3"disabled><span>
+                    +3 piercing if it can just tear metal apart</span>
+                </label>
+            </div>
+            <div><label for="in_ignores_armour">
+                <input id="in_ignores_armour" name="ignores_armour" type="checkbox">
+                armour doesn't help with the damage it deals (due to magic, size,
+                etc.)<span class="append">ignores armour</span>
+            </label></div>
+            <div>
+                <label for="in_ranged">
+                    <input id="in_ranged" name="ranged" type="checkbox">
+                    It usually attacks at range (with arrows, spells, or other
+                    projectiles)<span class="append">your choice of:</span>
+                </label><br>
+                <label for="in_range_near">
+                    <input id="in_range_near" type="radio" name="range"
+                    value="near" disabled><span>near</span>
+                </label>
+                <label for="in_range_far">
+                    <input id="in_range_far" type="radio" name="range"
+                    value="far" disabled><span>far</span>
+                </label>
+                <label for="in_range_both">
+                    <input id="in_range_both" type="radio" name="range"
+                    value="both" disabled><span>both</span>
+                </label>
+            </div>
+        </div>
+        <div>
+            <div class="in_header">
+                Which of these describe it?
+            </div>
+            <div>
+                <label for="in_devious">
+                    <input id="in_devious" name="devious" type="checkbox">
+                    It isn't dangerous because of the wounds it inflicts, but for
+                    other reasons<span class="append">devious, reduce its damage
+                    size by one, write a move about why it's dangerous:</span>
+                </label><br>
+                <div class="in_field">
+                    <input id="in_devious_move" name="devious_move" type="text"
+                           disabled>
+                </div>
+            </div>
+            <div>
+                <label for="in_organised">
+                    <input id="in_organised" name="organised" type="checkbox">
+                    It organizes into larger groups that it can call on for
+                    support<span class="append"> write a move about calling on
+                    others for help:</span>
+                </label><br>
+                <div class="in_field">
+                    <input id="in_organised_move" name="organised_move"
+                           type="text" disabled>
+                </div>
+            </div>
+            <div><label for="in_intelligent">
+                <input id="in_intelligent" name="intelligent" type="checkbox">
+                It's as smart as a human or
+                thereabouts<span class="append">intelligent</span>
+            </label></div>
+            <div><label for="in_cautious">
+                <input id="in_cautious" name="cautious" type="checkbox">
+                It actively defends itself with a shield or
+                similar<span class="append">cautious, +1 armour</span>
+            </label></div>
+            <div><label for="in_hoarder">
+                <input id="in_hoarder" name="hoarder" type="checkbox">
+                It collects trinkets that humans would consider
+                valuable (gold, gems, secrets)<span class="append">hoarder</span>
+            </label></div>
+            <div>
+                <label for="in_planar">
+                    <input id="in_planar" name="planar" type="checkbox">
+                    It's from beyond this world<span class="append">planar, write
+                    a move about using its otherwordly knowledge and power:</span>
+                </label><br>
+                <div class="in_field">
+                    <input id="in_planar_move" name="planar_move" type="text"
+                           disabled>
+                </div>
+            </div>
+            <div><label for="in_beyond_biology">
+                <input id="in_beyond_biology" name="beyond_biology" type="checkbox">
+                It's kept alive by something beyond simple
+                biology<span class="append">+4 HP</span>
+            </label></div>
+            <div>
+                <label for="in_construct">
+                    <input id="in_construct" name="construct" type="checkbox">
+                    It was made by someone<span class="append">construct, give it a
+                    special quality or two about its construction or purpose:</span>
+                </label><br>
+                <div class="in_field">
+                    <input id="in_construct_qualities"
+                    name="construct_qualities" type="text" disabled
+                    placeholder="Enter a comma-separated list of qualities.">
+                </div>
+            </div>
+            <div>
+                <label for="in_terrifying">
+                    <input id="in_terrifying" name="terrifying" type="checkbox">
+                    Its appearance is disturbing, terrible or
+                    horrible<span class="append">terrifying, write a special
+                    quality about why it's so horrendous</span>
+                </label><br>
+                <div class="in_field">
+                    <input id="in_terrifying_quality" name="terrifying_quality"
+                           type="text" disabled>
+                </div>
+            </div>
+            <div><label for="in_amorphous">
+                <input id="in_amorphous" name="amorphous" type="checkbox">
+                It doesn't have organs or discernible
+                anatomy<span class="append">amorphous, +1 armour, +3 HP</span>
+            </label></div>
+            <div><label for="in_ancient">
+                <input id="in_ancient" name="ancient" type="checkbox">
+                It (or its species) is ancient&mdash;older than man, elves or
+                dwarves<span class="append">increase its damage die size by one
+                </span>
+            </label></div>
+            <div><label for="in_nonviolent">
+                <input id="in_nonviolent" name="nonviolent" type="checkbox">
+                It abhors violence<span class="append">roll damage twice and take
+                the worst result</span>
+            </label></div>
+        </div>
+    </form>
+</body>

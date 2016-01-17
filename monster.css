@@ -1,0 +1,133 @@
+body {
+    font-family: sans-serif;
+}
+
+.in_header {
+    font-weight:bold;
+}
+input:disabled ~ span {
+    color: grey;
+}
+.append:before {
+    content: " – ";
+}
+.append {
+    color: grey;
+}
+#in_panel > div {
+    padding-top: 1em;
+}
+#in_panel > div:first-child {
+    padding-top: 0 !important;
+}
+#in_panel > div > div {
+    padding-bottom: 0.5em;
+}
+
+.in_field {
+    margin-right: 15px;
+}
+.in_field input {
+    width: 100%;
+}
+
+.out_monster > .out_row {
+    padding-top: 0.25em;
+}
+.out_monster > .out_row:first-child {
+    padding-top: 0 !important;
+}
+
+#out_name {
+    font-size: larger;
+}
+#out_tags {
+    font-style: italic;
+}
+#out_qualities_title, #out_instinct_title, #out_qualities, #out_instinct {
+    font-style: italic;
+}
+#out_moves {
+    margin: 0;
+}
+.warning {
+    color: red;
+    padding-top: 1em !important;
+}
+
+.out_field:empty::before {
+    background:#EEE;
+    color: #666;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    font-style: normal !important;
+    content: "?";
+}
+#out_name:empty::before {
+    content: "New Monster" !important;
+}
+
+.out_monster {
+    background: white;
+    padding: 0.5em;
+    margin-top: 1em !important;
+    outline: 1px solid black;
+    position: relative;
+}
+.out_monster:first-child {
+    margin-top: 0 !important;
+}
+.out_monster.selected {
+    outline: 3px solid black;
+}
+
+#out_handle_top {
+    position: absolute;
+    overflow: hidden;
+    opacity: 0;
+}
+#out_handle_text, #out_handle_top {
+    position: absolute;
+    right: 0; bottom: 0;
+    width: 4em; height: 2em;
+    font-size: smaller;
+}
+#out_handle_text {
+    text-align: center;
+    display: table;
+    outline: 1px solid black;
+}
+#out_handle_text > div {
+    display: table-cell;
+    overflow: hidden;
+    vertical-align: middle;
+}
+#out_handle_text > div::before {
+    content: "JSON";
+}
+#out_handle_text.error {
+    background: #F66 !important;
+}
+#out_handle_text.selected {
+    background: #88A;
+}
+
+#out_buttons {
+    position: absolute;
+    right: 0; top: 0;
+    margin: 0.25em;
+}
+
+#in_panel, #out_panel {
+    position: fixed;
+    overflow: auto;
+    top:0%; bottom:0%;
+    padding: 1em;
+}
+#in_panel {
+    left:50%; right:0%;
+}
+#out_panel {
+    background: #AAA;
+    left:0%; right:50%;
+}
