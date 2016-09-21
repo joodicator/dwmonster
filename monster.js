@@ -93,20 +93,20 @@ function MonsterElem(monster) {
     });
 
     handleTop.addEventListener("paste", (function (event) {
-        var monster = emptyMonster();
+        var newMonster = emptyMonster();
         var json = event.clipboardData.getData("text/plain");
         try {
             var data = JSON.parse(json);
-            for (var k in monster) {
+            for (var k in newMonster) {
                 if (!(k in data)) throw new Exception("missing key: " + k);
-                monster[k] = data[k]
+                newMonster[k] = data[k]
                 delete data[k];
             }
             for (var k in data) {
                 throw new Exception("unknown key: " + k);
             }
-            this.setMonster(monster);
-            if (selectedMonster == this) setInputMonster(monster);
+            this.setMonster(newMonster);
+            if (selectedMonster == this) setInputMonster(newMonster);
             saveMonsters();
         } catch (e) {
             byId("out_handle_text").className = "selected error";
@@ -150,7 +150,18 @@ function deleteMonster (monster) {
 }
 
 function loadMonsters() {
-    var rawMonsters = cookies.get("monsters", [emptyMonster()]);
+    var rawMonsters, count = cookies.get("monsterCount", null);
+    if (count === 0) {
+        rawMonsters = [emptyMonster()];
+    } else if (count !== null) {
+        rawMonsters = [];
+        for (var i=0; i < count; ++i) {
+            rawMonsters.push(cookies.get("monster" + i.toString()));
+        }
+    } else {
+        rawMonsters = cookies.get("monsters", [emptyMonster()]);
+    }
+
     monsters = [];
     forEach(rawMonsters, function (rawMonster) {
         var monster = new MonsterElem(rawMonster);
@@ -162,11 +173,14 @@ function loadMonsters() {
 }
 
 function saveMonsters() {
-    var rawMonsters = [];
-    forEach(monsters, function (monsterElem) {
-        rawMonsters.push(monsterElem.getMonster());
-    });
-    cookies.set("monsters", rawMonsters);
+    var prevCount = cookies.get("monsterCount");
+    cookies.set("monsterCount", monsters.length);
+    for (var i=0; i < monsters.length; ++i) {
+        cookies.set("monster" + i.toString(), monsters[i].getMonster());
+    }
+    for (; i < prevCount; ++i) {
+        cookies.set("monster" + i.toString());
+    }
 }
 
 function emptyMonster() {
@@ -200,6 +214,8 @@ function setInputMonster(monster) {
         if (typeof value == "boolean" && item.type == "checkbox") {
             item.checked = value;
             item.dispatchEvent(new CustomEvent("change"));
+        } else if (value === "" && item instanceof NodeList) {
+            forEach(item, function (elem) { elem.checked = false; })
         } else if (typeof value == "string") {
             item.value = value;
         }
@@ -266,6 +282,9 @@ function renderMonster(monster, e) {
             damageAdd += 3;
     }
 
+    if (monster.armour == "4") {
+        tags.push("magical");
+    }
     armour = parseInt(monster.armour);
     if (isNaN(armour)) armour = null;
 
@@ -312,7 +331,7 @@ function renderMonster(monster, e) {
         }
     }
     if (monster.magical) {
-        tags.push("magical");
+        if (tags.indexOf("magical") < 0) tags.push("magical");
         byId("out_magical_move",e).textContent = monster.magical_move;
         byId("out_magical_move",e).hidden = false;
     } else {
@@ -357,6 +376,7 @@ function renderMonster(monster, e) {
 
     if (monster.devious) {
         tags.push("devious");
+        if (damageSides !== null) damageSides -= 2;
         byId("out_devious_move",e).textContent = monster.devious_move;
         byId("out_devious_move",e).hidden = false;
     } else {
